@@ -1,6 +1,7 @@
 package org.smashgames.simplecloud.dependencyfixer;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 
 public class DependencyLookup {
 
@@ -10,8 +11,9 @@ public class DependencyLookup {
     public DependencyLookup(String fileName)
     {
         dependency = fileName.substring(0, fileName.length() - 4);
-        dependencyName = dependency.split("-")[0];
-        dependencyVersion = dependency.split("-")[1];
+        dependencyName = dependency.replace("-" + dependency.split("-")[dependency.split("-").length - 1], "");
+        dependencyVersion = dependency.split("-")[dependency.split("-").length - 1];
+        System.out.println(dependency + " | " + dependencyVersion);
     }
 
     public void perform()
@@ -31,14 +33,24 @@ public class DependencyLookup {
 
     private boolean hasHigherVersion(String otherVersion)
     {
-        int[] thisSidedVersionArgs = new int[dependencyVersion.split(".").length];
+        int[] thisSidedVersionArgs = new int[dependencyVersion.split("\\.").length];
         for(int i = 0; i < thisSidedVersionArgs.length; i++){
-            thisSidedVersionArgs[i] = Integer.parseInt(dependencyVersion.split(".")[i]);
+            try {
+                thisSidedVersionArgs[i] = Integer.parseInt(dependencyVersion.split("\\.")[i]);
+            }catch (Exception e)
+            {
+                thisSidedVersionArgs[i] = 0;
+            }
         }
 
-        int[] otherSidedVersionArgs = new int[otherVersion.split(".").length];
+        int[] otherSidedVersionArgs = new int[otherVersion.split("\\.").length];
         for(int i = 0; i < otherSidedVersionArgs.length; i++){
-            otherSidedVersionArgs[i] = Integer.parseInt(otherVersion.split(".")[i]);
+            try {
+                otherSidedVersionArgs[i] = Integer.parseInt(otherVersion.split("\\.")[i]);
+            }catch (Exception e)
+            {
+                otherSidedVersionArgs[i] = 0;
+            }
         }
 
         int index = 0;
