@@ -7,12 +7,12 @@ import java.util.Objects;
 public class DependencyFixer {
 
     private final File serverJar, dependencies;
-    private final String[] blockedDirs;
+    private final String[] changedDirs;
 
-    public DependencyFixer(String serverJarLocation, String dependenciesLocation, String... blockedDirs) throws Exception {
+    public DependencyFixer(String serverJarLocation, String dependenciesLocation, String... changedDirs) throws Exception {
         serverJar = new File(serverJarLocation);
         dependencies = new File(dependenciesLocation);
-        this.blockedDirs = blockedDirs;
+        this.changedDirs = changedDirs;
 
         if(!serverJar.exists()) throw new UnknownPathException("JAR_LOCATION is not existent");
         if(!dependencies.exists()) throw new UnknownPathException("DEPENDENCY_LOCATION is not existent");
@@ -35,7 +35,7 @@ public class DependencyFixer {
             System.out.println("Initializing copy for " + bestVersion.dependency);
             toCopy.add(new File(dependencies, bestVersion.dependency + ".jar"));
         }
-        ZipCopier.copyWithOut(toCopy, serverJar, new String[]{"META-INF", "about.html"}, blockedDirs);
+        ZipCopier.copyWithOut(toCopy, serverJar,  changedDirs);
 
 
         System.out.println("Done!");
@@ -47,16 +47,16 @@ public class DependencyFixer {
         {
             throw new UnknownPathException("Not enough arguments");
         }
-        String[] blocked = new String[args.length - 2];
+        String[] dirsToChange = new String[args.length - 2];
         if(args.length > 2)
         {
             for(int i = 2; i < args.length; i++)
             {
-                    blocked[i - 2] = args[i];
+                    dirsToChange[i - 2] = args[i];
             }
         }
         //Executes as java -jar DependencyFixer JAR_LOCATION DEPENDENCY_LOCATION
-        new DependencyFixer(args[0], args[1], blocked);
+        new DependencyFixer(args[0], args[1], dirsToChange);
     }
 
 }
